@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matrices con TensorFlow.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      input {
+        margin: 5px;
+        width: 60px;
+      }
+      button {
+        margin: 10px;
+        padding: 10px 15px;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Operaciones con Matrices (TensorFlow.js)</h2>
+    <label>Filas: <input type="number" id="rows" value="3" min="1" /></label>
+    <label>Columnas: <input type="number" id="cols" value="3" min="1" /></label>
+    <br />
+    <button onclick="operarMatrices('suma')">Sumar</button>
+    <button onclick="operarMatrices('multiplicacion')">Multiplicar</button>
+
+    <h3>Resultados:</h3>
+    <div id="output"></div>
+
+    <script>
+      function generarMatrizAleatoria(rows, cols) {
+        return tf.randomUniform([rows, cols], 1, 21, "int32");
+      }
+
+      async function operarMatrices(operacion) {
+        const rows = parseInt(document.getElementById("rows").value);
+        const cols = parseInt(document.getElementById("cols").value);
+        let output = document.getElementById("output");
+
+        const matA = generarMatrizAleatoria(rows, cols);
+        const matB =
+          operacion === "suma"
+            ? generarMatrizAleatoria(rows, cols)
+            : generarMatrizAleatoria(cols, rows);
+
+        const aData = await matA.array();
+        const bData = await matB.array();
+
+        let resultado, resData;
+        if (operacion === "suma") {
+          resultado = tf.add(matA, matB);
+        } else {
+          resultado = tf.matMul(matA, matB);
+        }
+        resData = await resultado.array();
+
+        output.innerHTML = `
+        <h4>Matriz A:</h4><pre>${JSON.stringify(aData, null, 2)}</pre>
+        <h4>Matriz B:</h4><pre>${JSON.stringify(bData, null, 2)}</pre>
+        <h4>Resultado (${operacion}):</h4><pre>${JSON.stringify(
+          resData,
+          null,
+          2
+        )}</pre>
+      `;
+      }
+    </script>
+  </body>
+</html>
